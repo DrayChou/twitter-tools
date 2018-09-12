@@ -98,8 +98,8 @@ def load_credentials():
 
 
 def get_credentials():
-    ck = confirm('Input consumer key: ', 'IQKbtAYlXLripLGPWd0HUA')
-    cs = confirm('Input consumer secret: ', 'GgDYlkSvaPxGxC4X8liwpUoqKwwr3lCADbz8A7ADU')
+    ck = confirm('Input consumer key: ', '')
+    cs = confirm('Input consumer secret: ', '')
 
     if confirm('Do you have access token and secret already?', default=False):
         at = input('Input access token: ')
