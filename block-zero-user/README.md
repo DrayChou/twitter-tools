@@ -6,3 +6,5 @@
 # Notes
 
 Consumer keys can be found [here](https://gist.github.com/mariotaku/5465786). Use these keys instead of applying yourself can get rid of rate limit.
+
+此项目来自于 @mariotaku 的 [批量脚本](https://gist.github.com/mariotaku/fe66f847d5a56ebbd5810b7b22171b10)
