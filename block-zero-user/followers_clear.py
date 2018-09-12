@@ -42,12 +42,14 @@ def remove_follower(uid):
     if cancelled:
         return
     try:
+        # B掉
         print('blocking %d' % uid)
         api.CreateBlock(uid)
     except TwitterError:
         block_failed_ids.append(uid)
     if unblock:
         try:
+            # 解除 B
             print('unblocking %d' % uid)
             api.DestroyBlock(uid)
         except TwitterError:
