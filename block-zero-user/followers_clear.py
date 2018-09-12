@@ -31,7 +31,7 @@ def confirm(message, default=None):
     if t == '' or t is None and default is not None:
         return default
     while t != 'y' and t != 'n':
-        t = input('Type y or n: ')
+        return t
     if t == 'y':
         return True
     else:
