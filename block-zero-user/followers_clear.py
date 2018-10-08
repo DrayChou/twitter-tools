@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import sys
 import concurrent.futures
 
 from twitter import TwitterError
@@ -130,7 +131,16 @@ consumer_key, consumer_secret, access_token, access_token_secret = credentials
 api = twitter.Api(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token_key=access_token,
                   access_token_secret=access_token_secret)
 
-# print(api.GetUser(screen_name='jackeychan5921'))
+# follower_ids_cursor, _, ids = api.GetFollowersPaged(count=10)
+# for user_info in ids:
+#     # print(user_info)
+#     # 锁推&关注了我&没有被我关注
+#     if user_info.protected == True:
+#         print('protected one info', user_info, user_info.status)
+#         if user_info.status == None:
+#             print('not follow me:', user_info.id, user_info.screen_name, user_info.name)
+
+# sys.exit("test, goodbye!")
 
 follower_ids_cursor = -1
 follower_ids = []
@@ -159,6 +169,11 @@ for user_info in follower_ls:
         # 默认头像的，直接加进来
         if user_info.default_profile_image == True:
             need_mutu = True
+
+        # 锁推&关注了我&没有被我关注
+        if user_info.protected == True:
+            if user_info.status == None:
+                need_mutu = True
 
         if need_mutu == False:
             continue
