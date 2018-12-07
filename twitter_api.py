@@ -113,5 +113,11 @@ api = twitter.Api(consumer_key=consumer_key, consumer_secret=consumer_secret, ac
                   access_token_secret=access_token_secret)
 
 if __name__ == '__main__':
-    user = api.GetUser(return_json=True)
-    print(user)
+    follower_ids_cursor, _, ids = api.GetFollowersPaged(count=10)
+    for user_info in ids:
+        # print(user_info)
+        # 锁推&关注了我&没有被我关注
+        if user_info.protected == True:
+            print('protected one info', user_info, user_info.status)
+            if user_info.status == None:
+                print('not follow me:', user_info.id, user_info.screen_name, user_info.name)

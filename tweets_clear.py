@@ -19,6 +19,7 @@ while(len(owned_status) > 0):
 
 print('Your ' + str(num_owned_status) + ' tweets has been deleted.')
 
+
 # Delete retweets
 owned_retweets = api.GetUserRetweets(count=200)
 num_owned_retweets = 0
