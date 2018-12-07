@@ -1,2 +1,3 @@
 *.list
 *.twitter_credentials.yml
+/__pycache__/
