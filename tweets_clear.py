@@ -19,6 +19,20 @@ while(len(owned_status) > 0):
 
 print('Your ' + str(num_owned_status) + ' tweets has been deleted.')
 
+# Delete retweets
+owned_retweets = api.GetUserRetweets(count=200)
+num_owned_retweets = 0
+while(len(owned_retweets) > 0):
+    for s in owned_retweets:
+        api.DestroyStatus(s.id)
+        print('One retweet deleted', s.id)
+        num_owned_retweets += 1
+    owned_retweets = api.GetUserRetweets(count=200)
+    time.sleep(2)
+
+print('Your ' + str(num_owned_retweets) + ' retweets has been deleted.')
+
+
 # Delete replies
 owned_replies = api.GetReplies(count=200)
 num_owned_replies = 0
