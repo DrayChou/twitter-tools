@@ -3,11 +3,14 @@
 
 import concurrent.futures
 from twitter import TwitterError
-from twitter_api import api,confirm
+from api import api,confirm
 
 follower_ids_cursor = -1
 follower_ids = []
 follower_ls = []
+
+check_protected = confirm(
+    'Do you deal with those who are protected and not tweeted?', default=True)
 
 # 拿到自己的 followers
 print('Getting followers list')
@@ -35,9 +38,10 @@ for user_info in follower_ls:
             need_mutu = True
 
         # 锁推&关注了我&没有被我关注
-        if user_info.protected == True:
-            if user_info.status == None:
-                need_mutu = True
+        if check_protected:
+            if user_info.protected == True:
+                if user_info.status == None:
+                    need_mutu = True
 
         if need_mutu == False:
             continue

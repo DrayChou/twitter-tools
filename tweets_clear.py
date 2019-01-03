@@ -4,7 +4,7 @@
 import time
 import concurrent.futures
 from twitter import TwitterError
-from twitter_api import api, confirm
+from api import api, confirm
 
 # Delete own tweets
 owned_status = api.GetUserTimeline(count=200)
