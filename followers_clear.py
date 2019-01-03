@@ -10,7 +10,7 @@ follower_ids = []
 follower_ls = []
 
 check_protected = confirm(
-    'Do you deal with those who are protected and not tweeted?', default=True)
+    'Do you deal with protected users who follow me but I don\'t follow?', default=False)
 
 # 拿到自己的 followers
 print('Getting followers list')
@@ -29,11 +29,11 @@ for user_info in follower_ls:
         need_mutu = False
         # user_info = api.GetUser(user_id=user_id)
 
-        # 有发言过的，跳过
+        # 没有发言过的，处理
         if user_info.statuses_count == 0:
             need_mutu = True
 
-        # 默认头像的，直接加进来
+        # 默认头像的，处理
         if user_info.default_profile_image == True:
             need_mutu = True
 
