@@ -20,4 +20,4 @@ for sc, msg_ls in more_than_time_msg.items():
     if (time.time() - last_tweet_time > sc):
         msg = msg_ls[random.randint(0, len(msg_ls)-1)]
         res = api.PostUpdate(msg)
-        print(res)
+        print(msg, res)
