@@ -1,0 +1,8 @@
+# !/usr/bin/env python3
+# -  *  - coding:UTF-8 -  *  -
+twid = 'me'
+more_than_time_msg = {
+    5: [
+        "么么哒，该睡觉了吗？ #taichibot",
+    ]
+}
