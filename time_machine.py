@@ -11,7 +11,7 @@ from time_machine_setting import twid, twtag, action_dict
 
 last_tweet_time = 0
 tweet_list = api.GetSearch(
-    term = "-#{} from:{}".format(twtag, twid), count = 1
+    term="-#{} from:{}".format(twtag, twid), count=1
 )
 if len(tweet_list) > 0:
     t_t = time.strptime(tweet_list[0].created_at, '%a %b %d %H:%M:%S %z %Y')
@@ -29,13 +29,15 @@ for sc, action_ls in action_dict.items():
             if action[0]():
                 msg_ls = action[1]
                 msg = msg_ls[random.randint(0, len(msg_ls)-1)]
+                msg = "#{} {}".format(twtag, msg)
                 res = api.PostUpdate(msg)
                 if res:
-                    print(res)
+                    print(msg, "\n", res)
                     tweed = True
                     break
                 else:
                     print(msg, res)
+                    pass
             else:
-                print(action)
+                # print(action)
                 pass
