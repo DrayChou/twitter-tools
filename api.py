@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import argparse
 from twitter import TwitterError
 import twitter
 from requests_oauthlib import OAuth1Session
@@ -37,14 +38,16 @@ def confirm(message, default=None):
 
 
 def get_access_token(ck, cs):
-    oauth_client = OAuth1Session(client_key=ck, client_secret=cs, callback_uri='oob')
+    oauth_client = OAuth1Session(
+        client_key=ck, client_secret=cs, callback_uri='oob')
 
     print('\nRequesting temp token from Twitter...\n')
 
     try:
         resp = oauth_client.fetch_request_token(REQUEST_TOKEN_URL)
     except ValueError as e:
-        raise 'Invalid response from Twitter requesting temp token: {0}'.format(e)
+        raise 'Invalid response from Twitter requesting temp token: {0}'.format(
+            e)
 
     url = oauth_client.authorization_url(AUTHORIZATION_URL)
 
@@ -68,7 +71,8 @@ def get_access_token(ck, cs):
     try:
         resp = oauth_client.fetch_access_token(ACCESS_TOKEN_URL)
     except ValueError as e:
-        raise 'Invalid response from Twitter requesting temp token: {0}'.format(e)
+        raise 'Invalid response from Twitter requesting temp token: {0}'.format(
+            e)
 
     return resp.get('oauth_token'), resp.get('oauth_token_secret')
 
@@ -97,7 +101,15 @@ def get_credentials():
 
 credentials = load_credentials()
 
-if not credentials or confirm('Do you want to switch to a new user?', default=False):
+# Create ArgumentParser() object
+parser = argparse.ArgumentParser()
+# Add argument
+parser.add_argument('--new_user', required=False, type=int,
+                    default=0, help="Do you want to switch to a new user?")
+# Parse argument
+args = parser.parse_args()
+
+if not credentials or (args.new_user != -1 and confirm('Do you want to switch to a new user?', default=False)):
     credentials = get_credentials()
     with open('.twitter_credentials.yml', 'w') as f:
         yaml.dump({
@@ -120,4 +132,5 @@ if __name__ == '__main__':
         if user_info.protected == True:
             print('protected one info', user_info, user_info.status)
             if user_info.status == None:
-                print('not follow me:', user_info.id, user_info.screen_name, user_info.name)
+                print('not follow me:', user_info.id,
+                      user_info.screen_name, user_info.name)
