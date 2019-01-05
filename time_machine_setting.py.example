@@ -1,8 +1,121 @@
 # !/usr/bin/env python3
 # -  *  - coding:UTF-8 -  *  -
-twid = 'me'
-more_than_time_msg = {
-    5: [
-        "么么哒，该睡觉了吗？ #taichibot",
-    ]
+
+import os
+import time
+import random
+from datetime import datetime
+from pytz import timezone
+
+# Current time
+now_datetime = datetime.now(timezone('Asia/Shanghai'))
+now_hour = int(now_datetime.strftime("%H"))
+
+
+def chance(c):
+    r = random.randint(0, 100)
+    print(r, c)
+    return (r % c) == 1
+
+
+twid = ""
+twtag = ""
+action_dict = {
+    # 一周没发推
+    604800: [
+        [
+            lambda:(chance(2)),
+            [
+                "#{} 啊啊啊，┌(。Д。)┐，主人整整一个星期没有发推了，我肯定是被遗弃了吧？救命啊！".format(twtag),
+            ]
+        ],
+    ],
+    # 三天没发推
+    259200: [
+        [
+            lambda:(chance(2)),
+            [
+                "#{} 么么哒，┌(。Д。)┐，主人整整三天没有发推了，会不会出了什么事情啊？".format(twtag),
+            ]
+        ],
+    ],
+    # 一天没发推
+    86400: [
+        [
+            lambda:(chance(2)),
+            [
+                "#{} 么么哒，主人整整一天没有发推了，今天在忙什么呢？".format(twtag),
+            ]
+        ],
+    ],
+    # 一小时没发推
+    3600: [
+        [
+            # 中午
+            lambda:(chance(3)and (now_hour >= 12 and now_hour < 14)),
+            [
+                "#{} 么么哒，主人今天会吃什么呢？".format(twtag),
+            ]
+        ],
+        [
+            # 下午
+            lambda:(chance(3)and (now_hour >= 14 and now_hour < 17)),
+            [
+                "#{} 么么哒，主人该困了吧？要不要来一杯咖啡呢？".format(twtag),
+            ]
+        ],
+        [
+            # 晚上
+            lambda:(chance(3)and (now_hour >= 0 and now_hour < 4)),
+            [
+                "#{} 么么哒，主人睡觉了吗？".format(twtag),
+            ]
+        ],
+        [
+            lambda:(chance(5)),
+            [
+                "#{} 么么哒，这里是测试机器人女仆， {}".format(
+                    twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                ),
+                "#{} 么么哒，这里还是测试机器人女仆， {}".format(
+                    twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                ),
+                "#{} 么么哒，主人又在调戏机器人女仆了， {}".format(
+                    twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                ),
+                "#{} 么么哒，啊啊啊，又被打屁股了， {}".format(
+                    twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                ),
+                "#{} 么么哒，阿拉拉，不想动了， {}".format(
+                    twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                ),
+            ]
+        ],
+    ],
+    # # 超过多久没有发推，执行下面的队列，单位秒
+    # 5: [
+    #     # 可以有多个待执行，一组只会执行一个
+    #     [
+    #         # 判断条件
+    #         lambda:(chance(5)),
+    #         # 随机拿一条说出去的话
+    #         [
+    #             "#{} 么么哒，这里是测试机器人女仆， {}".format(
+    #                 twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    #             ),
+    #             "#{} 么么哒，这里还是测试机器人女仆， {}".format(
+    #                 twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    #             ),
+    #             "#{} 么么哒，主人又在调戏机器人女仆了， {}".format(
+    #                 twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    #             ),
+    #             "#{} 么么哒，啊啊啊，又被打屁股了， {}".format(
+    #                 twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    #             ),
+    #             "#{} 么么哒，阿拉拉，不想动了， {}".format(
+    #                 twtag, now_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    #             ),
+    #         ]
+    #     ],
+    # ],
 }

@@ -84,12 +84,12 @@ def load_credentials():
 
 
 def get_credentials():
-    ck = confirm('Input consumer key: ', '')
-    cs = confirm('Input consumer secret: ', '')
+    ck = confirm('Input consumer key: ', '').strip()
+    cs = confirm('Input consumer secret: ', '').strip()
 
     if confirm('Do you have access token and secret already?', default=False):
-        at = input('Input access token: ')
-        ats = input('Input access token secret: ')
+        at = input('Input access token: ').strip()
+        ats = input('Input access token secret: ').strip()
     else:
         at, ats = get_access_token(ck, cs)
     return ck, cs, at, ats
