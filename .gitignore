@@ -1,4 +1,4 @@
 *.list
-*.twitter_credentials.yml
+*.twitter_credentials.*
 /__pycache__/
 *setting.py
