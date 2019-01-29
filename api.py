@@ -79,10 +79,19 @@ def get_access_token(ck, cs):
 
 def load_credentials():
     try:
+        config = {}
+        
+        with open('.twitter_consumer.yml') as f:
+            c = yaml.load(f)
+            if c:
+                config.update(c)
+        
         with open('.twitter_credentials.yml') as f:
             c = yaml.load(f)
-            return c['consumer_key'], c['consumer_secret'], c['access_token'], \
-                c['access_token_secret']
+            if c:
+                config.update(c)
+        
+        return config
     except IOError:
         return None
 
@@ -111,10 +120,14 @@ args = parser.parse_args()
 
 if not credentials or (args.new_user != -1 and confirm('Do you want to switch to a new user?', default=False)):
     credentials = get_credentials()
-    with open('.twitter_credentials.yml', 'w') as f:
+    with open(".twitter_consumer.yml", "w") as f:
         yaml.dump({
             'consumer_key': credentials[0],
             'consumer_secret': credentials[1],
+        }, f, default_flow_style=False)
+
+    with open('.twitter_credentials.yml', 'w') as f:
+        yaml.dump({
             'access_token': credentials[2],
             'access_token_secret': credentials[3],
         }, f, default_flow_style=False)
