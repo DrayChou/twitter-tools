@@ -7,4 +7,4 @@ from twitter import TwitterError
 from api import api, confirm
 
 
-print(api.GetSearch(raw_query="f=tweets&q=from%3Avido_sun1%20until%3A2018-01-01"))
+print(api.GetSearch(term="from:vido_sun1 until:2018-01-01"))
