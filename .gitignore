@@ -5,3 +5,4 @@ nohup.out
 .twitter_consumer.yml
 /__pycache__/
 *setting.py
+/.vscode
