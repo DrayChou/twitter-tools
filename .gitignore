@@ -1,5 +1,6 @@
 nohup.out
 *.list
-*.twitter_credentials.*
+*.twitter_credentials.yml
+.twitter_consumer.yml
 /__pycache__/
 *setting.py
