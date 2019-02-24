@@ -81,7 +81,16 @@ def load_credentials():
     try:
         with open('.twitter_credentials.yml') as f:
             c = yaml.load(f)
-            return c['access_token'], c['access_token_secret']
+            return c['access_token'], c['access_token_secret'], c.get("user")
+    except IOError:
+        return None
+
+
+def load_myself():
+    try:
+        with open('.twitter_credentials.yml') as f:
+            c = yaml.load(f)
+            return c.get("user")
     except IOError:
         return None
 
@@ -109,6 +118,14 @@ def get_consumer():
     cs = confirm('Input consumer secret: ', '').strip()
     return ck, cs,
 
+
+def get_myself():
+    res_post = api.PostUpdate("test")
+    res_del = api.DestroyStatus(res_post.id)
+
+    return res_post.user
+
+
 # Create ArgumentParser() object
 parser = argparse.ArgumentParser()
 # Add argument
@@ -120,7 +137,7 @@ args = parser.parse_args()
 consumer = load_consumer()
 credentials = load_credentials()
 
-if not consumer or confirm('Do you want to switch to a new consumer?', default=False):
+if not consumer or (args.new_user != -1 and confirm('Do you want to switch to a new consumer?', default=False)):
     credentials = None
     consumer = get_consumer()
     with open(".twitter_consumer.yml", "w") as f:
@@ -129,21 +146,25 @@ if not consumer or confirm('Do you want to switch to a new consumer?', default=F
             'consumer_secret': consumer[1],
         }, f, default_flow_style=False)
 
+is_new_credentials = False
 if not credentials or (args.new_user != -1 and confirm('Do you want to switch to a new user?', default=False)):
+    is_new_credentials = True
     credentials = get_credentials(consumer[0], consumer[1])
+
+api = twitter.Api(
+    consumer_key=consumer[0], consumer_secret=consumer[1],
+    access_token_key=credentials[0], access_token_secret=credentials[1]
+)
+
+# 拿到自己的信息
+if is_new_credentials:
+    myself = get_myself()
     with open('.twitter_credentials.yml', 'w') as f:
         yaml.dump({
             'access_token': credentials[0],
             'access_token_secret': credentials[1],
+            'user': myself,
         }, f, default_flow_style=False)
-
-consumer_key, consumer_secret = consumer
-access_token, access_token_secret = credentials
-
-api = twitter.Api(
-    consumer_key=consumer_key, consumer_secret=consumer_secret,
-    access_token_key=access_token, access_token_secret=access_token_secret
-)
 
 if __name__ == '__main__':
     follower_ids_cursor, _, ids = api.GetFollowersPaged(count=10)
