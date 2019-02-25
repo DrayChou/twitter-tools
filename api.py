@@ -81,8 +81,8 @@ def load_credentials():
     try:
         with open('.twitter_credentials.yml') as f:
             c = yaml.load(f)
-            return c['access_token'], c['access_token_secret'], c.get("user")
-    except IOError:
+            return c['access_token'], c['access_token_secret'], c.get("user", None)
+    except Exception:
         return None
 
 
@@ -91,7 +91,7 @@ def load_myself():
         with open('.twitter_credentials.yml') as f:
             c = yaml.load(f)
             return c.get("user")
-    except IOError:
+    except Exception:
         return None
 
 
@@ -100,7 +100,7 @@ def load_consumer():
         with open('.twitter_consumer.yml') as f:
             c = yaml.load(f)
             return c['consumer_key'], c['consumer_secret']
-    except IOError:
+    except Exception:
         return None
 
 
@@ -121,9 +121,11 @@ def get_consumer():
 
 def get_myself():
     res_post = api.PostUpdate("test")
-    res_del = api.DestroyStatus(res_post.id)
+    if res_post and res_post.id:
+        res_del = api.DestroyStatus(res_post.id)
+        return res_post.user
 
-    return res_post.user
+    return res_post
 
 
 # Create ArgumentParser() object
@@ -142,7 +144,7 @@ if not consumer or (args.new_user != -1 and confirm('Do you want to switch to a 
     consumer = get_consumer()
     with open(".twitter_consumer.yml", "w") as f:
         yaml.dump({
-            'consumer_key': consumer[0],
+            'consumer_key'   : consumer[0],
             'consumer_secret': consumer[1],
         }, f, default_flow_style=False)
 
@@ -161,9 +163,9 @@ if is_new_credentials:
     myself = get_myself()
     with open('.twitter_credentials.yml', 'w') as f:
         yaml.dump({
-            'access_token': credentials[0],
+            'access_token'       : credentials[0],
             'access_token_secret': credentials[1],
-            'user': myself,
+            'user'               : myself._json,
         }, f, default_flow_style=False)
 
 if __name__ == '__main__':

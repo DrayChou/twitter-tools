@@ -9,7 +9,6 @@ from api import api, confirm, load_myself
 
 myself = load_myself()
 print(myself)
-print(myself.id)
 
 # res_post = api.PostUpdate("test")
 # print(res_post)

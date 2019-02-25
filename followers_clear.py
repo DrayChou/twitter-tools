@@ -3,14 +3,38 @@
 
 import concurrent.futures
 from twitter import TwitterError
-from api import api,confirm
+from api import api, confirm
+
+# 配置文件
+config = dict({
+    # 是否删除那些跟随我而我没有跟随的账号
+    # Do you deal with protected users who follow me but I don't follow?
+    "check_protected"      : False,
+
+    # 少于多少推的处理
+    # delete if less than
+    "less_statuses_count"  : 10,
+
+    # 少于多少个关注着的处理
+    # delete if less than
+    "less_followers_count" : 10,
+
+    # 是否处理默认头像的账号
+    # delete if default profile image
+    "default_profile_image": True,
+
+    # 处理这些账号之后是否解除对他们的封锁
+    # Unblock those users after removed from followers list?
+    "unblock"              : True,
+
+    # 白名单账号
+    # whitelist
+    "white_list"           : []
+})
 
 follower_ids_cursor = -1
 follower_ids = []
 follower_ls = []
-
-check_protected = confirm(
-    'Do you deal with protected users who follow me but I don\'t follow?', default=False)
 
 # 拿到自己的 followers
 print('Getting followers list')
@@ -20,8 +44,9 @@ while follower_ids_cursor != 0:
     follower_ls += ids
 print('You have %d followers' % len(follower_ls))
 
+# 需要清理的账号
 no_mutual_followers = []
-
+white_list = config.get("white_list", [])
 print('Getting zero or default profile image user info')
 for user_info in follower_ls:
     follower_ids.append(user_info.id)
@@ -29,16 +54,25 @@ for user_info in follower_ls:
         need_mutu = False
         # user_info = api.GetUser(user_id=user_id)
 
-        # 没有发言过的，处理
-        if user_info.statuses_count == 0:
+        # 白名单
+        if user_info.id in white_list or user_info.screen_name in white_list:
+            continue
+
+        # 少于多少推的处理，处理
+        if user_info.statuses_count <= config.get("less_statuses_count", 0):
+            need_mutu = True
+
+        # 少于多少个关注着的处理，处理
+        if user_info.followers_count <= config.get("less_followers_count", 0):
             need_mutu = True
 
         # 默认头像的，处理
-        if user_info.default_profile_image == True:
-            need_mutu = True
+        if config.get("default_profile_image", True):
+            if user_info.default_profile_image == True:
+                need_mutu = True
 
         # 锁推&关注了我&没有被我关注
-        if check_protected:
+        if config.get("check_protected", False):
             if user_info.protected == True:
                 if user_info.status == None:
                     need_mutu = True
@@ -47,8 +81,13 @@ for user_info in follower_ls:
             continue
 
         # 加到需要 B 的队列中
-        print(user_info.id, user_info.screen_name, user_info.name,
-              user_info.default_profile_image, user_info.statuses_count)
+        print(
+            user_info.id, user_info.screen_name, user_info.name, "\t\t\t",
+            "protected:", user_info.protected,
+            "default_profile_image:", user_info.default_profile_image,
+            "statuses_count:", user_info.statuses_count,
+            "followers_count:", user_info.followers_count
+        )
         no_mutual_followers.append(user_info.id)
 
     except TwitterError as e:
@@ -65,13 +104,8 @@ with open('zero_ids.list', 'w') as f:
     for user_id in no_mutual_followers:
         f.write('%d\n' % user_id)
 
-unblock = confirm(
-    'Unblock those users after removed from followers list?', default=True)
-
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
-
 cancelled = False
-
 block_failed_ids = []
 unblock_failed_ids = []
 
@@ -85,7 +119,7 @@ def remove_follower(uid):
         api.CreateBlock(uid)
     except TwitterError:
         block_failed_ids.append(uid)
-    if unblock:
+    if config.get("unblock", True):
         try:
             # 解除 B
             print('unblocking %d' % uid)
