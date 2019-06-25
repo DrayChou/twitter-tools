@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import time
 import concurrent.futures
 from twitter import TwitterError
 from api import api, confirm
@@ -32,23 +33,49 @@ config = dict({
     "white_list"           : []
 })
 
+def remove_follower(uid):
+    if cancelled:
+        return
+    try:
+        # B掉
+        print('blocking %d' % uid)
+        api.CreateBlock(uid)
+    except TwitterError:
+        block_failed_ids.append(uid)
+    if config.get("unblock", True):
+        try:
+            # 解除 B
+            print('unblocking %d' % uid)
+            api.DestroyBlock(uid)
+        except TwitterError:
+            unblock_failed_ids.append(uid)
+
 follower_ids_cursor = -1
 follower_ids = []
 follower_ls = []
+no_mutual_followers = []
 
 # 拿到自己的 followers
 print('Getting followers list')
 while follower_ids_cursor != 0:
-    follower_ids_cursor, _, ids = api.GetFollowersPaged(
-        cursor=follower_ids_cursor)
-    follower_ls += ids
+    ids = []
+    try:
+        follower_ids_cursor, _, ids = api.GetFollowersPaged(
+            cursor=follower_ids_cursor)
+        print('get %d followers' % len(ids))
+        follower_ls += ids
+
+        time.sleep(5)
+    except Exception as e:
+        # print(e)
+        pass
+
 print('You have %d followers' % len(follower_ls))
 
 # 需要清理的账号
-no_mutual_followers = []
 white_list = config.get("white_list", [])
 print('Getting zero or default profile image user info')
-for user_info in follower_ls:
+for user_info in ids:
     follower_ids.append(user_info.id)
     try:
         need_mutu = False
@@ -97,36 +124,19 @@ for user_info in follower_ls:
         print(e)
 
 print('You have %d followers is zero or default profile image user.' %
-      len(no_mutual_followers))
+    len(no_mutual_followers))
 
 # 记录下这些垃圾帐号的ID
-with open('zero_ids.list', 'w') as f:
+with open('zero_ids.list', 'w+') as f:
     for user_id in no_mutual_followers:
         f.write('%d\n' % user_id)
+
+time.sleep(15)
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 cancelled = False
 block_failed_ids = []
 unblock_failed_ids = []
-
-
-def remove_follower(uid):
-    if cancelled:
-        return
-    try:
-        # B掉
-        print('blocking %d' % uid)
-        api.CreateBlock(uid)
-    except TwitterError:
-        block_failed_ids.append(uid)
-    if config.get("unblock", True):
-        try:
-            # 解除 B
-            print('unblocking %d' % uid)
-            api.DestroyBlock(uid)
-        except TwitterError:
-            unblock_failed_ids.append(uid)
-
 
 try:
     for user_id in no_mutual_followers:
@@ -136,10 +146,11 @@ except (KeyboardInterrupt, SystemExit):
     cancelled = True
     print('Interrupted, exiting...')
 
-with open('block_failed_ids.list', 'w') as f:
+with open('block_failed_ids.list', 'w+') as f:
     for user_id in block_failed_ids:
         f.write('%d\n' % user_id)
 
-with open('unblock_failed_ids.list', 'w') as f:
+with open('unblock_failed_ids.list', 'w+') as f:
     for user_id in unblock_failed_ids:
         f.write('%d\n' % user_id)
+
