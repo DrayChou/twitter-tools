@@ -7,3 +7,6 @@ nohup.out
 *setting.py
 /.vscode
 /.idea
+/build
+/dist
+/*.spec
